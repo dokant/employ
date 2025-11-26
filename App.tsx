@@ -484,57 +484,39 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // [실제 운영 적용 가이드]
-    // 문의 내역 수신 이메일 주소: cirrus01@naver.com
-    // 텔레그램 봇 API 또는 EmailJS 서비스를 연동하여 아래 로직을 구성합니다.
-    const RECIPIENT_EMAIL = "cirrus01@naver.com";
+    try {
+      // FormSubmit.co를 사용하여 이메일 전송 (백엔드 없이 정적 웹사이트에서 이메일 발송 가능)
+      // 첫 전송 시 수신자 이메일(cirrus01@naver.com)로 'Activate Form' 인증 메일이 발송됩니다.
+      // 해당 메일의 버튼을 클릭해야 이후부터 정상적으로 문의 내용이 수신됩니다.
+      const response = await fetch("https://formsubmit.co/ajax/cirrus01@naver.com", {
+        method: "POST",
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          _subject: `[기업노동·안전] ${formData.companyName} (${formData.contactName}) 상담 신청`,
+          _template: 'table', // 이메일 내용을 깔끔한 표 형태로 수신
+          회사명: formData.companyName,
+          담당자명: formData.contactName,
+          연락처: formData.phone,
+          이메일: formData.email,
+          문의분야: formData.type,
+          상세내용: formData.message
+        })
+      });
 
-    // TODO: 아래 값을 실제 운영하는 텔레그램 봇 정보로 교체하세요.
-    const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
-    const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE";     
-
-    const message = `
-🔔 *[새로운 상담 신청]*
-➡ *수신자*: ${RECIPIENT_EMAIL}
-
-🏢 *회사명*: ${formData.companyName}
-👤 *담당자*: ${formData.contactName}
-📞 *연락처*: ${formData.phone}
-📧 *이메일*: ${formData.email}
-📑 *분야*: ${formData.type}
-
-📝 *상세 내용*:
-${formData.message}
-    `;
-
-    console.log(`Sending inquiry to ${RECIPIENT_EMAIL} via configured service...`);
-
-    // 봇 토큰이 설정되어 있다면 전송을 시도합니다.
-    if (TELEGRAM_BOT_TOKEN !== "YOUR_BOT_TOKEN_HERE") {
-      try {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: 'Markdown',
-          }),
-        });
-      } catch (error) {
-        console.error("텔레그램 전송 오류:", error);
+      if (response.ok) {
+        setIsSubmitted(true);
+      } else {
+        throw new Error("전송 실패");
       }
-    } else {
-      console.log("서비스 연동 대기 중 (테스트 모드)");
-      console.log("전송 내용:\n", message);
-      // UX 테스트를 위한 인위적인 딜레이
-      await new Promise(resolve => setTimeout(resolve, 1500));
+    } catch (error) {
+      console.error("Form submission error:", error);
+      alert("상담 신청 전송 중 오류가 발생했습니다. \n잠시 후 다시 시도해주시거나 전화(010-7128-8192)로 문의 부탁드립니다.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
   };
   
   const resetForm = () => {

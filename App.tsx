@@ -710,6 +710,26 @@ const Contact: React.FC = () => {
                 title="Office Location"
               ></iframe>
             </div>
+            
+            {/* Map Links */}
+            <div className="flex gap-3">
+              <a 
+                href="https://map.naver.com/p/search/서울특별시%20강남구%20강남대로%20320" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex-1 bg-[#03C75A] text-white py-3 rounded-lg font-bold text-center hover:bg-[#02b351] transition flex items-center justify-center gap-2"
+              >
+                <span>N</span> 네이버 지도에서 보기
+              </a>
+              <a 
+                href="https://map.kakao.com/link/search/서울특별시%20강남구%20강남대로%20320" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex-1 bg-[#FAE100] text-[#3C1E1E] py-3 rounded-lg font-bold text-center hover:bg-[#eac900] transition flex items-center justify-center gap-2"
+              >
+                <span>K</span> 카카오맵에서 보기
+              </a>
+            </div>
           </div>
         </div>
       </div>
